@@ -1,5 +1,6 @@
 <template>
     <div id="login">
+
         <n-button @click='userLogin'>登录</n-button>
     </div>
 </template>
@@ -8,27 +9,33 @@
 
 import {useMessage} from 'naive-ui'
 import {login} from "../../api/user";
+import {useStorage} from "../../hooks";
 
 const nMessage = useMessage()
 
 interface loginRes {
-    code: string,
+    code: number,
     token: string,
     message: string
 
 }
 
+
+const s = useStorage()
+
+s.set('x',{a:'hhhh'})
+
+
 const userLogin = async () => {
     const {token, message, code}: loginRes = await login()
-
     if (!token || code != 200) return
 
-    localStorage.setItem('x-token', token)
+   localStorage.setItem('x-token', token)
+
+
     nMessage.success(message)
 
-
 }
-
 
 </script>
 
