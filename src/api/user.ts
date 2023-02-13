@@ -1,6 +1,8 @@
-import request from "./request";
+import {request} from "./request";
+import {loginModelType, loginResOption} from "../@types/login";
 
 
-export const login =   () =>    request('/mock/login')
-export const userList =  () =>  request('/mock/user')
+export const userLoginApi = (data: loginModelType) => request<loginResOption>({
+    url: '/mock/login',
+})
 

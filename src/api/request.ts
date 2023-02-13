@@ -1,16 +1,23 @@
-import axios from 'axios'
+import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 
-//const URL = import.meta.env.VITE_MOCK_URL
-
-const request = axios.create({
-    url:'/',
-    timeout:3000
+const instance: AxiosInstance = axios.create({
+    baseURL: '/',
+    timeout: 3000
 })
 
 
-//console.log(URL)
-
-request.interceptors.response.use((res=>{
+instance.interceptors.response.use(async res => {
+    const {code, message} = res.data
+    if (code >= 400) {
+        // @ts-ignore
+        return Promise.reject(message)
+    }
     return res.data
-}))
-export default request
+})
+
+export const request = async <T>(config: AxiosRequestConfig): Promise<T> => {
+    return await instance.request(config)
+
+}
+
+
