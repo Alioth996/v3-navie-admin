@@ -2,21 +2,15 @@
 
 
 
-const initStorge = (storage: string = 'local')=>{
-
-
-    console.log(storage);
-    
+export const useStorage = (storage: string = 'local')=>{
     const sdb = storage === 'local' ? localStorage : sessionStorage
-    
     const get = (key:string)=>{
        return sdb.getItem(key)
     }
 
-
-    const set = (key:string,value:any,)=>{
-
+    const set = (key:string,value:any)=>{
         sdb.setItem(key,JSON.stringify(value))
+
     }
 
    function clear(){
@@ -36,4 +30,3 @@ const initStorge = (storage: string = 'local')=>{
 }
 
 
-export const useStorage = initStorge

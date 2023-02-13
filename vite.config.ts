@@ -8,7 +8,10 @@ export default defineConfig({
   plugins: [
     vue(),
     AutoImport({
-      resolvers: [NaiveUiResolver()]
+      // 按需自动导入组件
+      resolvers: [NaiveUiResolver()],
+      // 自动导入vue内置api
+      imports:['vue']
     }),
     Components({
       resolvers: [NaiveUiResolver()]
