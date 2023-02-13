@@ -1,37 +1,75 @@
 <template>
+
+
+
     <div id="login">
-        <n-form ref="loginFormRef" label-placement="left" :model="loginModel" :rules="Loginrules">
-            <n-form-item path="username" label="账号">
-                <n-input v-model:value="loginModel.username" @keydown.enter.prevent />
-            </n-form-item>
-            <n-form-item path="password" label="密码">
-                <n-input v-model:value="loginModel.password" type="password" @keydown.enter.prevent />
-            </n-form-item>
-            <n-form-item>
-                <n-button @click="handleValidateClick">登录</n-button>
-            </n-form-item>
-        </n-form>
+        <div class="login-form">
+            <n-card :bordered="false">
+                <header class="logo-box">
+                    <img src="../../assets/images/logo.png">
+                </header>
+                <n-form ref="loginFormRef" label-placement="left" :model="loginModel" :rules="Loginrules">
+                    <n-form-item path="username">
+                        <n-input v-model:value="loginModel.username" size="large" @keydown.enter.prevent
+                            placeholder="Enterusername..." />
+                    </n-form-item>
+                    <n-form-item path="password">
+                        <n-input v-model:value="loginModel.password" placeholder="Enter password" size="large"
+                            type="password" @keydown.enter.prevent />
+                    </n-form-item>
+
+                    <n-form-item path="password">
+                        <n-input v-model:value="loginModel.phone" placeholder="Enter phone" size="large"
+                            @keydown.enter.prevent />
+                    </n-form-item>
+                    <n-form-item path="password">
+                        <div class="verfiy-code-box">
+                            <n-input v-model:value="loginModel.verify_code" size="large" placeholder="Enter verfiy-code"
+                                @keydown.enter.prevent />
+                            <n-button size="large" ghost :disabled="isDisable" @click="getVerifyCode">{{
+                                timeLabel
+                            }}</n-button>
+                        </div>
+
+                    </n-form-item>
+                    <n-form-item>
+                        <n-button type='primary' size="large" block ghost @click="handleValidateClick">登录</n-button>
+                    </n-form-item>
+                </n-form>
+
+            </n-card>
+
+        </div>
     </div>
+
 </template>
 
 <script setup lang='ts'>
 
-import {FormInst, FormRules, useMessage} from 'naive-ui'
-import {reactive, ref} from 'vue';
-import {useRouter} from 'vue-router';
-import {loginModelType} from '../../@types/login';
-import {userLoginApi} from "../../api/user";
-import {useStorage} from "../../hooks";
+import { FormInst, FormRules, useMessage, useNotification } from 'naive-ui'
+import { onUpdated, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { loginModelType } from '../../@types/login';
+import { userLoginApi, userLoginVerfiyCode } from "../../api/user";
+import { useStorage } from "../../hooks";
 
 
 const nMessage = useMessage()
+const notification = useNotification()
+
 const router = useRouter()
 
+
+const timeLabel = ref('获取验证码')
+const isDisable = ref<boolean>(false)
+let timer: any
 
 const loginFormRef = ref<FormInst | null>(null)
 const loginModel = reactive<loginModelType>({
     username: 'admin',
-    password: '123456'
+    password: '123456',
+    verify_code: '',
+    phone: ''
 })
 
 const Loginrules: FormRules = {
@@ -62,26 +100,95 @@ const handleValidateClick = (e: MouseEvent) => {
     })
 }
 
+
+const getVerifyCode = async () => {
+    const { captcha, message } = await userLoginVerfiyCode({ phone: loginModel.phone })
+    if (captcha) {
+        notification.success({
+            content: message,
+            meta: `验证码:${captcha} 20分钟内有效`,
+            duration: 1000 * 5
+
+        })
+
+        // 
+        let count = 60
+        timer = (setInterval(() => {
+            timeLabel.value = `倒计时 ${count} 秒`
+            if (count == 0) {
+                clearInterval(timer)
+                timeLabel.value = '获取验证码'
+                isDisable.value = false
+                count = 60
+            }
+            count--
+
+        }, 1000))
+
+
+        isDisable.value = true
+        loginModel.verify_code = captcha
+    }
+}
+
 const userLogin = async () => {
-    const {token, message} = await userLoginApi(loginModel)
+    const { token, message } = await userLoginApi(loginModel)
     const useLocal = useStorage()
     useLocal.set('x-token', token)
     await router.replace('/home')
     nMessage.success(message)
-
     // 清空路由表
     // location.reload()
 }
+
+onUpdated(() => {
+    clearInterval(timer)
+    timer = null
+})
+
+
 
 </script>
 
 <style scoped lang="less">
 #login {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     height: 100%;
     width: 100%;
-    // background-color: #ccc;
+    background: url("../../assets/images/bg.png") no-repeat bottom left;
+
+    .login-form {
+        margin-right: 200px;
+        box-shadow: 0 0 5px #00000010;
+        width: 400px;
+        min-height: 360px;
+        border: 1px solid #18a058;
+        border-radius: 20px;
+
+        .n-card {
+            height: 100%;
+
+            header {
+                height: 180px;
+                text-align: center;
+
+                img {
+                    display: inline-block;
+                    height: 100%;
+                }
+            }
+
+            .verfiy-code-box {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+            }
+        }
+
+
+    }
 }
 </style>
