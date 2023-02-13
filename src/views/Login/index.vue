@@ -16,12 +16,12 @@
 
 <script setup lang='ts'>
 
-import { useMessage, FormRules, FormInst } from 'naive-ui'
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { loginModelType, loginRes } from '../../@types/Login';
-import { login } from "../../api/user";
-import { useStorage } from "../../hooks";
+import {FormInst, FormRules, useMessage} from 'naive-ui'
+import {reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {loginModelType} from '../../@types/login';
+import {userLoginApi} from "../../api/user";
+import {useStorage} from "../../hooks";
 
 
 const nMessage = useMessage()
@@ -29,7 +29,7 @@ const router = useRouter()
 
 
 const loginFormRef = ref<FormInst | null>(null)
-const loginModel = ref<loginModelType>({
+const loginModel = reactive<loginModelType>({
     username: 'admin',
     password: '123456'
 })
@@ -63,14 +63,14 @@ const handleValidateClick = (e: MouseEvent) => {
 }
 
 const userLogin = async () => {
-    const { token, message, code }: loginRes = await login()
-    if (!token || code != 200) return
+    const {token, message} = await userLoginApi(loginModel)
     const useLocal = useStorage()
     useLocal.set('x-token', token)
     await router.replace('/home')
     nMessage.success(message)
 
-
+    // 清空路由表
+    // location.reload()
 }
 
 </script>
