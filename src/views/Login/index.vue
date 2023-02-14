@@ -1,7 +1,4 @@
 <template>
-
-
-
     <div id="login">
         <div class="login-form">
             <n-card :bordered="false">
@@ -26,8 +23,8 @@
                         <div class="verfiy-code-box">
                             <n-input v-model:value="loginModel.verify_code" size="large" placeholder="Enter verfiy-code"
                                 @keydown.enter.prevent />
-                            <n-button size="large" ghost :disabled="isDisable" @click="getVerifyCode">{{
-                                timeLabel
+                            <n-button size="large" ghost :disabled="disabled" @click="getVerifyCode">{{
+                                label
                             }}</n-button>
                         </div>
 
@@ -49,20 +46,24 @@
 import { FormInst, FormRules, useMessage, useNotification } from 'naive-ui'
 import { onUpdated, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+
+
 import { loginModelType } from '../../@types/login';
 import { userLoginApi, userLoginVerfiyCode } from "../../api/user";
 import { useStorage } from "../../hooks";
+
+// 按钮倒计时功能
+import useCount from '../../hooks/useSmScode'
+
+const { disabled, label, startCount } = useCount()
+
+
 
 
 const nMessage = useMessage()
 const notification = useNotification()
 
 const router = useRouter()
-
-
-const timeLabel = ref('获取验证码')
-const isDisable = ref<boolean>(false)
-let timer: any
 
 const loginFormRef = ref<FormInst | null>(null)
 const loginModel = reactive<loginModelType>({
@@ -110,27 +111,11 @@ const getVerifyCode = async () => {
             duration: 1000 * 5
 
         })
-
-        // 
-        let count = 60
-        timer = (setInterval(() => {
-            timeLabel.value = `倒计时 ${count} 秒`
-            if (count == 0) {
-                clearInterval(timer)
-                timeLabel.value = '获取验证码'
-                isDisable.value = false
-                count = 60
-            }
-            count--
-
-        }, 1000))
-
-
-        isDisable.value = true
+        startCount()
         loginModel.verify_code = captcha
     }
-}
 
+}
 const userLogin = async () => {
     const { token, message } = await userLoginApi(loginModel)
     const useLocal = useStorage()
@@ -140,11 +125,6 @@ const userLogin = async () => {
     // 清空路由表
     // location.reload()
 }
-
-onUpdated(() => {
-    clearInterval(timer)
-    timer = null
-})
 
 
 
