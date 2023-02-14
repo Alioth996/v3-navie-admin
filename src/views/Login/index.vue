@@ -43,21 +43,19 @@
 
 <script setup lang='ts'>
 
-import { FormInst, FormRules, useMessage, useNotification } from 'naive-ui'
-import { onUpdated, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {FormInst, FormRules, useMessage, useNotification} from 'naive-ui'
+import {reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
 
 
-import { loginModelType } from '../../@types/login';
-import { userLoginApi, userLoginVerfiyCode } from "../../api/user";
-import { useStorage } from "../../hooks";
+import {loginModelType} from '../../@types/login';
+import {userLoginApi, userLoginVerfiyCode} from "../../api/user";
+import {useStorage} from "../../hooks";
 
 // 按钮倒计时功能
-import useCount from '../../hooks/useSmScode'
+import useCount from './hook/useSmScode'
 
 const { disabled, label, startCount } = useCount()
-
-
 
 
 const nMessage = useMessage()
