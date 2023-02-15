@@ -1,28 +1,5 @@
 import { computed, ref } from "vue";
-import { useTimer } from "./common/useTimer";
-
-function useBoolean(value: boolean) {
-  let bool = ref(value);
-
-  function setFalse() {
-    bool.value = false;
-  }
-
-  function setTrue() {
-    bool.value = true;
-  }
-
-  function toggleBool() {
-    bool.value = !bool.value;
-  }
-
-  return {
-    bool,
-    setFalse,
-    setTrue,
-    toggleBool,
-  };
-}
+import { useBoolean, useTimer } from "../../../hooks/common";
 
 export default function useCount(second: number = 5) {
   if (second <= 0 && second % 1 !== 0) {
