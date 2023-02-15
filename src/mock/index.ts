@@ -35,7 +35,7 @@ const useMock = () => {
     }
   });
 
-  Mock.mock("/mock/verify_code", "post", (option: any) => {
+  Mock.mock("/mock/verify_code", "post", () => {
     captcha = Math.random().toFixed(6).slice(-6);
     return {
       data: null,

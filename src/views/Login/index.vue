@@ -3,7 +3,7 @@
         <div class="login-form">
             <n-card :bordered="false">
                 <header class="logo-box">
-                    <img src="../../assets/images/logo.png">
+                    <img alt="logo" src="../../assets/images/logo.png">
                 </header>
                 <n-form ref="loginFormRef" :model="loginModel" :rules="Loginrules" label-placement="left">
                     <n-form-item path="username">
